@@ -1,6 +1,7 @@
-import { Badge, Card, CardContent, CardHeader, CardTitle } from "../App";
-import { groupStagger } from "../components/motion";
-import { templates } from "../content";
+import { Button } from "../components/Button";
+import { Badge, Card, CardContent, CardHeader, CardTitle } from "../components/Badge";
+import { groupStagger } from "../components/Motion";
+import { templates } from "../content.js";
 // import { motion } from "framer-motion";
 
 export const TemplatesSection = () => {

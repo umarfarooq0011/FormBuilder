@@ -1,6 +1,6 @@
-import { groupStagger } from "../components/motion";
-import { Card, CardContent, CardHeader, CardTitle } from "../App";
-import { faqs } from "../content";
+import { groupStagger } from "../components/Motion";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/Badge";
+import { faqs } from "../content.js";
 // import { motion } from "framer-motion";
 
 

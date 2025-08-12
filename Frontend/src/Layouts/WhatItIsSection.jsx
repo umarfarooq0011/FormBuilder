@@ -1,5 +1,5 @@
-import { Card, CardContent } from "../App";
-import { groupStagger, reveal } from "../components/motion";
+import { Card, CardContent } from "../components/Badge";
+import { groupStagger, reveal } from "../components/Motion";
 // import { motion } from "framer-motion";
 
 export const WhatItIsSection = ()  => {

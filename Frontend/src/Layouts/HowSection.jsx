@@ -1,7 +1,7 @@
-import { steps } from "framer-motion";
-import { Badge, Card, CardContent, CardHeader, CardTitle } from "../App";
+import { steps } from "../content.js";
+import { Badge, Card, CardContent, CardHeader, CardTitle } from "../components/Badge";
 import { LinkIcon } from "lucide-react";
-import { groupStagger } from "../components/motion";
+import { groupStagger } from "../components/Motion";
 // import { motion } from "framer-motion";
 
 export const HowSection = () => {

@@ -1,6 +1,6 @@
 import { useMotionValue, useTransform } from "framer-motion";
 import { useRef } from "react";
-import { rm } from "./motion";
+import { rm } from "./Motion";
 import { LayoutTemplate, MousePointerClick } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../App";
 

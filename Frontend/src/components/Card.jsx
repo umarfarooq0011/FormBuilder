@@ -1,4 +1,4 @@
-import { reveal } from "./motion";
+import { reveal } from "./Motion";
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 

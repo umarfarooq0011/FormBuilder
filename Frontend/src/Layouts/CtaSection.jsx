@@ -1,5 +1,5 @@
-import { Button, Card, CardContent } from "../App";
-import { groupStagger } from "../components/motion";
+import { Button, Card, CardContent } from "../components/Badge";
+import { groupStagger } from "../components/Motion";
 
 
 export const CtaSection = () => {

@@ -1,7 +1,7 @@
 import { CalendarCheck2, CheckCircle2, ShieldCheck } from "lucide-react";
-import { Badge, Button } from "../App";
+import { Badge, Button } from "../components/Badge";
 import { ParallaxPreview } from "../components/ParallaxPreview";
-import { groupStagger, reveal } from './../components/motion';
+import { groupStagger, reveal } from '../components/Motion';
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 

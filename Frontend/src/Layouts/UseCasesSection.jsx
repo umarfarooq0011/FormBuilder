@@ -1,6 +1,6 @@
-import { Card, CardContent, CardHeader, CardTitle } from "../App";
-import { groupStagger } from "../components/motion";
-import { useCases } from "../content";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/Badge";
+import { groupStagger } from "../components/Motion";
+import { useCases } from "../content.js";
 // import { motion } from "framer-motion";
 
 export const UseCasesSection = () => {

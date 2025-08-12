@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { rm } from "./motion";
+import { rm } from "./Motion";
+
 
 export const CursorGlow = ()  => {
   const [pos, setPos] = useState({ x: -9999, y: -9999 });

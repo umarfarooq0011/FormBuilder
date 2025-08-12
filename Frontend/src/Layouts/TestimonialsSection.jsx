@@ -1,6 +1,6 @@
 import { Smile, Sparkles } from "lucide-react";
-import { Badge, Card, CardContent } from "../App";
-import { groupStagger } from "../components/motion";
+import { Badge, Card, CardContent } from "../components/Badge";
+import { groupStagger } from "../components/Motion";
 // import { motion } from "framer-motion";
 
 const quotes = [

@@ -1,5 +1,6 @@
-import { Badge, Card, CardContent } from "../App";
-import { groupStagger } from "../components/motion";
+import { Badge } from "../components/Badge";
+import { Card, CardContent } from "../components/Card";
+import { groupStagger } from "../components/Motion";
 // import { motion } from "framer-motion";
 
 const flow = [
