@@ -1,5 +1,6 @@
 import { Button } from "../components/Button";
-import { Badge, Card, CardContent, CardHeader, CardTitle } from "../components/Badge";
+import { Badge } from "../components/Badge";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/Card";
 import { groupStagger } from "../components/Motion";
 import { templates } from "../content.js";
 // import { motion } from "framer-motion";

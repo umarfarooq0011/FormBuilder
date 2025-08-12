@@ -1,4 +1,5 @@
-import { Button, Card, CardContent } from "../components/Badge";
+import { Button } from "../components/Button";
+import { Card, CardContent } from "../components/Card";
 import { groupStagger } from "../components/Motion";
 
 

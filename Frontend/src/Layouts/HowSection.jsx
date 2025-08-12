@@ -1,5 +1,6 @@
 import { steps } from "../content.js";
-import { Badge, Card, CardContent, CardHeader, CardTitle } from "../components/Badge";
+import { Badge } from "../components/Badge";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/Card";
 import { LinkIcon } from "lucide-react";
 import { groupStagger } from "../components/Motion";
 // import { motion } from "framer-motion";

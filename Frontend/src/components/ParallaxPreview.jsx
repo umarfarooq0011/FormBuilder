@@ -2,7 +2,7 @@ import { useMotionValue, useTransform } from "framer-motion";
 import { useRef } from "react";
 import { rm } from "./Motion";
 import { LayoutTemplate, MousePointerClick } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "../App";
+import { Card, CardContent, CardHeader, CardTitle } from "./Card";
 
 export const ParallaxPreview = () => {
   const ref = useRef(null);

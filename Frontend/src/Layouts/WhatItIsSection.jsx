@@ -1,4 +1,4 @@
-import { Card, CardContent } from "../components/Badge";
+import { Card, CardContent } from "../components/Card";
 import { groupStagger, reveal } from "../components/Motion";
 // import { motion } from "framer-motion";
 

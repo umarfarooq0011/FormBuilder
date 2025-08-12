@@ -1,5 +1,6 @@
 import { Smile, Sparkles } from "lucide-react";
-import { Badge, Card, CardContent } from "../components/Badge";
+import { Badge } from "../components/Badge";
+import { Card, CardContent } from "../components/Card";
 import { groupStagger } from "../components/Motion";
 // import { motion } from "framer-motion";
 

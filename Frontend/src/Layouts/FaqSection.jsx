@@ -1,5 +1,5 @@
 import { groupStagger } from "../components/Motion";
-import { Card, CardContent, CardHeader, CardTitle } from "../components/Badge";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/Card";
 import { faqs } from "../content.js";
 // import { motion } from "framer-motion";
 

@@ -1,4 +1,5 @@
-import { Badge, Button } from "../App";
+import { Badge } from "./Badge";
+import { Button } from "./Button";
 import { rm } from "./Motion";
 
 export const Navbar = () => {
