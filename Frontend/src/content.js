@@ -1,4 +1,3 @@
-// Centralized content & icon wiring
 import {
   MousePointerClick,
   LayoutTemplate,
@@ -7,50 +6,34 @@ import {
   BarChart3,
   Link as LinkIcon,
   CalendarCheck2,
-  Smile,
+  CheckCircle2,
   Sparkles,
   Layers3,
-  Megaphone,
-  Users,
-  Handshake,
   Inbox,
   ShieldCheck,
+  UploadCloud,
 } from "lucide-react";
 
-export const features = [
-  { icon: <MousePointerClick className="h-6 w-6" />, title: "Drag & drop, no code", desc: "Pick fields from the sidebar and arrange them like blocks." },
-  { icon: <Layers3 className="h-6 w-6" />, title: "Tweak anything", desc: "Rename, mark required, add help text — fast." },
-  { icon: <Share2 className="h-6 w-6" />, title: "Share with a link", desc: "Publish instantly and send a clean link to anyone." },
-  { icon: <Inbox className="h-6 w-6" />, title: "All replies in one place", desc: "See every submission at a glance and search when you need." },
-  { icon: <FileSpreadsheet className="h-6 w-6" />, title: "Export anytime", desc: "Download your results to a spreadsheet with one click." },
-  { icon: <ShieldCheck className="h-6 w-6" />, title: "Private by default", desc: "You choose who can view and edit forms." },
+export const FEATURES_BIG = [
+  { icon: Layers3, title: "Design with blocks", desc: "Drag fields onto a canvas and fine‑tune labels, help text, and validation — all live.", accent: "from-emerald-500/10 to-transparent" },
+  { icon: Share2, title: "Share in one click", desc: "Publish a clean link or embed the form on any site. No hosting drama.", accent: "from-cyan-500/10 to-transparent" },
+  { icon: Inbox, title: "See every reply", desc: "A single inbox for submissions with filters, search, and instant export.", accent: "from-amber-400/10 to-transparent" },
 ];
 
-export const steps = [
-  { num: 1, title: "Design", desc: "Drag fields onto the page and tweak the details." },
-  { num: 2, title: "Share", desc: "Publish and send a link or embed on your site." },
-  { num: 3, title: "Collect", desc: "Watch responses roll in and export when you’re ready." },
+export const MINI_FEATURES = [
+  { icon: MousePointerClick, label: "Drag & drop" },
+  { icon: ShieldCheck, label: "Private by default" },
+  { icon: FileSpreadsheet, label: "CSV/XLSX export" },
+  { icon: LinkIcon, label: "Embeds" },
+  { icon: BarChart3, label: "Insights" },
+  { icon: CalendarCheck2, label: "Quick to launch" },
 ];
 
-export const templates = [
-  { name: "Contact Form", blurb: "Simple way for people to reach you." },
-  { name: "Event RSVP", blurb: "Track attendees and meal choices." },
-  { name: "Job Application", blurb: "Collect resumes and key details." },
-  { name: "Bug Report", blurb: "Let users flag issues with context." },
+export const STEPS = [
+  { title: "Design", desc: "Arrange fields and set rules.", hint: "WYSIWYG" },
+  { title: "Share", desc: "Publish a link or embed.", hint: "One click" },
+  { title: "Collect", desc: "Track results in one place.", hint: "Export anytime" },
 ];
 
-export const faqs = [
-  { q: "Do I need to code?", a: "Nope. Just drag, drop, and share the link." },
-  { q: "Can I embed the form on my website?", a: "Yes. Paste a tiny embed and it works anywhere." },
-  { q: "Where do my responses go?", a: "They appear in your dashboard, ready to review and export." },
-  { q: "Is it safe?", a: "Your forms are private to you. You control who can view and edit." },
-];
-
-export const useCases = [
-  { icon: <Megaphone className="h-5 w-5" />, title: "Marketing", desc: "Run surveys and giveaways." },
-  { icon: <Users className="h-5 w-5" />, title: "HR", desc: "Job applications and onboarding." },
-  { icon: <Handshake className="h-5 w-5" />, title: "Support", desc: "Bug reports and feedback." },
-  { icon: <BarChart3 className="h-5 w-5" />, title: "Ops", desc: "Requests and approvals." },
-];
-
-export { CalendarCheck2, Smile, Sparkles, LinkIcon, LayoutTemplate };
+// Useful re-exports for icons used inline in App sections
+export { CheckCircle2, ShieldCheck, CalendarCheck2, LinkIcon, Sparkles, Layers3, Share2, Inbox, UploadCloud, LayoutTemplate, MousePointerClick };

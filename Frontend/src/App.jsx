@@ -1,9 +1,12 @@
-import { LandingPage } from "./Pages/LandingPage"
+import React from 'react'
+import LandingPage from './Pages/LandingPage'
 
-export const App = () => {
-  return(
+const App = () => {
+  return (
     <>
-    <LandingPage/>
+      <LandingPage />
     </>
   )
 }
+
+export default App
