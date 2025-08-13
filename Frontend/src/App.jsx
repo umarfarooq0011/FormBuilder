@@ -1,12 +1,12 @@
 import React from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import LandingPage from './Pages/LandingPage'
-import FormBuilderPage from './Pages/FormBuilderPage'
 import PublicFormPage from './Pages/PublicFormPage'
 import SharePage from './Pages/SharePage'
 import NotFoundPage from './Pages/NotFoundPage'
 import { Navbar } from './components/layouts/Navbar'
 import { Footer } from './components/layouts/Footer'
+import FormBuilderPage from './Pages/FormBuilderPage'
 
 const App = () => {
   const location = useLocation()
