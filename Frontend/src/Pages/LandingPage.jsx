@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import {
   Badge,
   CalendarCheck2,
@@ -104,12 +105,19 @@ const LandingPage = () => {
                     variants={reveal}
                     className="mt-8 flex flex-wrap items-center gap-3"
                   >
-                    <Button size="lg" className="rounded-2xl">
-                      Start building
-                    </Button>
+                   <Link to="/builder">
+                     <Button size="lg" className="rounded-2xl">
+                       Start building
+                     </Button>
+                   </Link>
+
+
+                      <Link to="/form/sample-demo">
                     <Button size="lg" variant="outline" className="rounded-2xl">
                       See a live demo
                     </Button>
+                    </Link>
+                    
                     <div className="flex items-center gap-2 text-sm text-emerald-300">
                       <CheckCircle2 className="h-4 w-4" /> No sign‑up for demo
                     </div>
@@ -372,12 +380,18 @@ const LandingPage = () => {
                   </p>
                 </div>
                 <div className="flex gap-3">
-                  <Button size="lg" className="rounded-2xl">
-                    Start building
-                  </Button>
+                   <Link to="/builder">
+                   <Button size="lg" className="rounded-2xl">
+                     Start building
+                   </Button>
+                   </Link>
+
+                  <Link to="/form/sample-demo">
                   <Button size="lg" variant="secondary" className="rounded-2xl">
                     View a sample form
                   </Button>
+                  </Link>
+                  
                 </div>
               </div>
             </div>
