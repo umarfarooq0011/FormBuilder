@@ -1,10 +1,14 @@
+import logoForm from "../../assets/logoform.png";
+
+
 export const Footer = () => (
   <footer className="border-t border-slate-800/70 bg-black/80">
     <div className="mx-auto max-w-7xl px-6 py-10">
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
         <div>
           <div className="mb-3 flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-cyan-400 text-black font-bold">F</div>
+            <img src={logoForm} alt="FormForge Logo" className="h-12 w-12 rounded-xl" />
+
             <span className="text-sm font-semibold tracking-wide text-slate-100">FormForge</span>
           </div>
           <p className="text-sm text-slate-400">Build forms the easy way. Share a link, collect answers, export results.</p>
