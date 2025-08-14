@@ -22,11 +22,14 @@ import { motion } from "framer-motion";
 import { Button } from "../components/Ui/Button";
 import { ParallaxPreview } from "../components/ParallaxPreview";
 import { FEATURES_BIG, MINI_FEATURES, STEPS } from "../content";
-import React from "react";
+import React, { useState } from "react";
 import { BentoCard } from "../components/Bento/Glow";
+import { Modal } from "../components/Ui/Modal";
+import demoVideo from "../assets/live-demo_video.mp4";
 
 const LandingPage = () => {
   useAOS();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const rm =
     typeof window !== "undefined" &&
@@ -112,11 +115,27 @@ const LandingPage = () => {
                    </Link>
 
 
-                      <Link to="/form/sample-demo">
-                    <Button size="lg" variant="outline" className="rounded-2xl">
+                    <Button 
+                      size="lg" 
+                      variant="outline" 
+                      className="rounded-2xl"
+                      onClick={() => setIsModalOpen(true)}
+                    >
                       See a live demo
                     </Button>
-                    </Link>
+
+                    <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+                      <div className="aspect-video w-full overflow-hidden rounded-xl">
+                        <video 
+                          src={demoVideo} 
+                          className="h-full w-full object-cover" 
+                          controls 
+                          autoPlay 
+                        >
+                          Your browser does not support the video tag.
+                        </video>
+                      </div>
+                    </Modal>
                     
                     <div className="flex items-center gap-2 text-sm text-emerald-300">
                       <CheckCircle2 className="h-4 w-4" /> No sign‑up for demo
