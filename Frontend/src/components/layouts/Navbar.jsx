@@ -24,6 +24,9 @@ export const Navbar = () => (
         </Badge>
       </div>
       <nav className="hidden items-center gap-6 text-sm text-slate-300 md:flex">
+        <Link to="/share" className="hover:text-white">
+          My Forms
+        </Link>
         <a href="#features" className="hover:text-white">
           Features
         </a>
@@ -32,17 +35,9 @@ export const Navbar = () => (
         </a>
       </nav>
       <div className="flex items-center gap-2">
-
-        <Link to="/form/sample-demo">
-          <Button className="hidden md:inline" variant="ghost">
-            Try demo
-          </Button>
-        </Link>
-
         <Link to="/builder">
           <Button className="rounded-2xl">Start building</Button>
         </Link>
-        
       </div>
     </div>
   </div>

@@ -1,43 +1,59 @@
-import { useParams, Link } from 'react-router-dom'
+import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Button } from '../components/Ui/Button'
 
 const SharePage = () => {
-  const { formId } = useParams()
-  const formUrl = `${window.location.origin}/form/${formId}`
-
-  const copyToClipboard = async () => {
-    try {
-      await navigator.clipboard.writeText(formUrl)
-    } catch (err) {
-      console.error('Failed to copy:', err)
+  // This would come from backend later, for now using hardcoded data
+  const [publishedForms] = useState([
+    {
+      id: 'form-1',
+      title: 'Customer Feedback Form',
+      submissions: 12,
+      created: '2025-08-10',
+    },
+    {
+      id: 'form-2', 
+      title: 'Event Registration',
+      submissions: 5,
+      created: '2025-08-12',
     }
+  ])
+
+  const handleShare = (formId) => {
+    // For now just copy the form URL to clipboard
+    const formUrl = `${window.location.origin}/form/${formId}`
+    navigator.clipboard.writeText(formUrl)
+    alert('Form URL copied to clipboard!')
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-16">
-      <div className="rounded-lg border border-slate-800 bg-slate-900/50 p-8">
-        <h1 className="mb-6 text-2xl font-bold">Your form is ready to share!</h1>
-        
+    <div className="min-h-screen bg-gradient-to-b from-neutral-950 via-neutral-950 to-black">
+      <div className="mx-auto max-w-7xl px-4 py-12">
         <div className="mb-8">
-          <label className="mb-2 block text-sm text-slate-400">Share Link</label>
-          <div className="flex gap-2">
-            <input
-              type="text"
-              readOnly
-              value={formUrl}
-              className="flex-1 rounded-lg border border-slate-700 bg-slate-800 px-4 py-2"
-            />
-            <Button onClick={copyToClipboard}>Copy</Button>
-          </div>
+          <h1 className="text-2xl font-bold text-white">Published Forms</h1>
+          <p className="mt-2 text-slate-400">View and share your published forms</p>
         </div>
 
-        <div className="flex gap-4">
-          <Link to={`/form/${formId}`} target="_blank">
-            <Button variant="ghost">Preview Form</Button>
-          </Link>
-          <Link to={`/builder/${formId}`}>
-            <Button>Continue Editing</Button>
-          </Link>
+        <div className="grid gap-4">
+          {publishedForms.map(form => (
+            <div key={form.id} className="rounded-lg border border-slate-800 bg-slate-900/50 p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-medium text-white">{form.title}</h3>
+                  <div className="mt-1 flex items-center gap-4 text-sm text-slate-400">
+                    <span>{form.submissions} submissions</span>
+                    <span>Created {form.created}</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Link to={`/submissions/${form.id}`}>
+                    <Button variant="ghost">View Submissions</Button>
+                  </Link>
+                  <Button onClick={() => handleShare(form.id)}>Share</Button>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

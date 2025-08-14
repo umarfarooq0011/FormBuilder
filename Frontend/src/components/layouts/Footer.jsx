@@ -1,4 +1,5 @@
 import logoForm from "../../assets/logoform.webp";
+import { Link } from "react-router-dom";
 
 
 export const Footer = () => (
@@ -16,9 +17,9 @@ export const Footer = () => (
         <div>
           <h4 className="mb-3 text-sm font-semibold text-slate-200">Product</h4>
           <ul className="space-y-2 text-sm text-slate-400">
-            <li><a href="#features" className="hover:text-white">Builder</a></li>
-            <li><a href="#how" className="hover:text-white">Submissions</a></li>
-            <li><a href="#how" className="hover:text-white">Embeds</a></li>
+            <li><Link to="/builder" className="hover:text-white">Builder</Link></li>
+            <li><Link to="/share" className="hover:text-white">My Forms</Link></li>
+            <li><Link to="/" className="hover:text-white">Embeds</Link></li>
           </ul>
         </div>
         <div>

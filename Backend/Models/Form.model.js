@@ -1,0 +1,31 @@
+import mongoose from "mongoose";
+import { Schema } from "mongoose";
+
+// Sub-document schema for a single form field
+const FieldSchema = new Schema({
+    id: { type: String, required: true },  // uid() from client
+    type: { type: String, required: true },  // text, email, select, etc.
+    config: { type: Schema.Types.Mixed, default: {} },
+
+}, { _id: false });  // Prevents Mongoose from adding its own _id to each field
+
+
+// Main schema for the entire form
+
+const FormSchema = new Schema({
+    title: { type: String, default: 'Untitled Form' },
+    ownerId: { type: String, default: 'demo' }, // plug in real auth later
+
+    // DRAFT the builder edits live
+    fields: { type: [FieldSchema], default: [] },
+
+    // PUBLISHED read-only snapshot for public routes
+     published: {
+      isPublished: { type: Boolean, default: false },
+      slug: { type: String, index: true, sparse: true },  // For clean public URLs
+      fields: { type: [FieldSchema], default: [] },
+      publishedAt: { type: Date },
+    },
+  }, { timestamps: true });
+
+export default mongoose.model('Form', FormSchema);

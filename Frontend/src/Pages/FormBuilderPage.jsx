@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { DndContext, MouseSensor, TouchSensor, useSensor, useSensors, DragOverlay } from "@dnd-kit/core";
 import { closestCenter } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
@@ -18,6 +19,8 @@ import { renderLive } from "../components/FormBuilder";
 
 
 export const FormBuilderPage = ()  => {
+  const navigate = useNavigate();
+  
   // Sensors: drag starts after 5px for mouse; touch enabled
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
@@ -103,18 +106,11 @@ export const FormBuilderPage = ()  => {
   };
 
   // Actions
-  const handleShare = () => {
-    const payload = { fields };
-    navigator.clipboard
-      .writeText(JSON.stringify(payload, null, 2))
-      .then(() => alert("Form JSON copied to clipboard."));
-  };
-
   const handlePublish = async () => {
-    alert("Publish clicked! Replace with API call to get a public URL.");
-  };
-
-  // Drag overlay for palette items
+    // Later this will save to backend
+    // For now just navigate to share page
+    navigate('/share');
+  };  // Drag overlay for palette items
   const ActiveDragOverlay = activeDrag?.from === "palette" ? (
     <div className="rounded-xl border border-indigo-600/40 bg-indigo-600/20 px-3 py-2 text-sm text-indigo-100 shadow-xl">
       {activeDrag?.item?.type}
@@ -124,7 +120,7 @@ export const FormBuilderPage = ()  => {
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-neutral-950 via-neutral-950 to-black text-neutral-100">
       {/* Top bar */}
-      <TopBar onPreview={() => setShowPreview(true)} onShare={handleShare} onPublish={handlePublish} />
+      <TopBar onPreview={() => setShowPreview(true)} onPublish={handlePublish} />
 
       <DndContext
         sensors={sensors}

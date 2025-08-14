@@ -7,8 +7,7 @@ import NotFoundPage from './Pages/NotFoundPage'
 import { Navbar } from './components/layouts/Navbar'
 import { Footer } from './components/layouts/Footer'
 import { FormBuilderPage } from './Pages/FormBuilderPage'
-
-
+import SubmissionsPage from './Pages/SubmissionsPage'
 
 const App = () => {
   const location = useLocation()
@@ -23,7 +22,8 @@ const App = () => {
           <Route path="/builder" element={<FormBuilderPage />} />
           <Route path="/builder/:formId" element={<FormBuilderPage />} />
           <Route path="/form/:formId" element={<PublicFormPage />} />
-          <Route path="/share/:formId" element={<SharePage />} />
+          <Route path="/share" element={<SharePage />} />
+          <Route path="/submissions/:formId" element={<SubmissionsPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>
