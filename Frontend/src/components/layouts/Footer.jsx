@@ -1,4 +1,4 @@
-import logoForm from "../../assets/logoform.png";
+import logoForm from "../../assets/logoform.webp";
 
 
 export const Footer = () => (

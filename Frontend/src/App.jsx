@@ -6,7 +6,9 @@ import SharePage from './Pages/SharePage'
 import NotFoundPage from './Pages/NotFoundPage'
 import { Navbar } from './components/layouts/Navbar'
 import { Footer } from './components/layouts/Footer'
-import FormBuilderPage from './Pages/FormBuilderPage'
+import { FormBuilderPage } from './Pages/FormBuilderPage'
+
+
 
 const App = () => {
   const location = useLocation()

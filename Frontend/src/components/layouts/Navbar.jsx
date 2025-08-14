@@ -1,6 +1,6 @@
 import { Badge } from "../Ui/Badge";
 import { Button } from "../Ui/Button";
-import logoForm from "../../assets/logoform.png";
+import logoForm from "../../assets/logoform.webp";
 import { Link } from "react-router-dom";
 
 
