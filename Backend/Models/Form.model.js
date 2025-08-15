@@ -14,7 +14,7 @@ const FieldSchema = new Schema({
 
 const FormSchema = new Schema({
     title: { type: String, default: 'Untitled Form' },
-    ownerId: { type: String, default: 'demo' }, // plug in real auth later
+    ownerId: { type: String, required: true, index: true }, // Make it required and indexed for faster lookups
     views: { type: Number, default: 0 },
     submissions: { type: Number, default: 0 },
 
