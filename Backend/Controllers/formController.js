@@ -2,6 +2,52 @@ import crypto from 'crypto';
 import Form from '../Models/Form.model.js';
 import Submission from '../Models/Submission.model.js';
 
+
+
+/**
+ * @desc    Get all forms
+ * @route   GET /api/forms
+ * @access  Public (for now)
+ */
+export const getAllForms = async (req, res, next) => {
+  try {
+    const forms = await Form.find({ ownerId: 'demo' }).sort({ createdAt: -1 });
+    res.status(200).json({ forms });
+  } catch (error) {
+    console.error('Error fetching all forms:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+    next(error);
+  }
+};
+
+/**
+ * @desc    Delete a form and its submissions
+ * @route   DELETE /api/forms/:id
+ * @access  Public (for now)
+ */
+export const deleteForm = async (req, res, next) => {
+  try {
+    const formId = req.params.id;
+    const form = await Form.findById(formId);
+
+    if (!form) {
+      return res.status(404).json({ message: 'Form not found' });
+    }
+
+    // First, delete all submissions associated with the form
+    await Submission.deleteMany({ form: formId });
+
+    // Then, delete the form itself
+    await Form.findByIdAndDelete(formId);
+
+    res.status(200).json({ message: 'Form and all its submissions deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting form:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+    next(error);
+  }
+};
+
 // generate humanish slug for published URLs
 
 const makeSlug = () => {
