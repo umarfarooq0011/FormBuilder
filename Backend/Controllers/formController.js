@@ -77,13 +77,15 @@ const makeSlug = () => {
 export const createForm = async(req, res, next) => {
     try {
         // Get title and the new ownerId from the request body
-         const { title, ownerId } = req.body;
+         const { title, description, createdBy, ownerId } = req.body;
           if (!ownerId) {
            return res.status(400).json({ message: 'Owner ID is required to create a form' });
          }
            const form = await Form.create({
-            title: title || 'Untitled Form',
-            ownerId: ownerId // Set the owner from the request
+             title: title || 'Untitled Form',
+            description: description || 'This is my form description.', // Add this
+            createdBy: createdBy || 'Anonymous', // Add this
+            ownerId: ownerId
          });
          res.status(201).json({ id: form._id, form });
 
@@ -118,7 +120,7 @@ export const getForm = async(req, res, next) => {
 
 export const patchForm = async(req, res, next) => {
     try {
-        const { fields, title, ownerId } = req.body || {};
+        const { fields, title, description, ownerId } = req.body || {};
         if (!ownerId) {
             return res.status(400).json({ message: 'Owner ID is required for updates.' });
         }
@@ -133,6 +135,7 @@ export const patchForm = async(req, res, next) => {
         const update = {};
         if (Array.isArray(fields)) update.fields = fields;
         if (typeof title === 'string') update.title = title;
+        if (typeof description === 'string') update.description = description;
 
         const updatedForm = await Form.findByIdAndUpdate(
             req.params.id,

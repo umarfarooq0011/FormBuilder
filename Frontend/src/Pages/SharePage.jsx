@@ -19,12 +19,13 @@ const SharePage = () => {
     }
   ])
 
-  const handleShare = (formId) => {
+  const handleShare = (slug) => {
     // For now just copy the form URL to clipboard
-    const formUrl = `${window.location.origin}/form/${formId}`
+    const formUrl = `${window.location.origin}/form/${slug}`;
     navigator.clipboard.writeText(formUrl)
     alert('Form URL copied to clipboard!')
   }
+  
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-neutral-950 via-neutral-950 to-black">

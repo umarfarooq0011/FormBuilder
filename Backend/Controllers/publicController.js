@@ -14,6 +14,8 @@ export const getPublicForm = async (req, res, next) => {
       form: {
         id: form._id,
         title: form.title,
+        description: form.description, // Add this line
+        createdBy: form.createdBy,   // Add this line
         fields: form.published.fields,
       },
     });

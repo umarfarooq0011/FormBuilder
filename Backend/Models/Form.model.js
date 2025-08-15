@@ -14,6 +14,8 @@ const FieldSchema = new Schema({
 
 const FormSchema = new Schema({
     title: { type: String, default: 'Untitled Form' },
+    description: { type: String, default: '' }, // Add this line
+    createdBy: { type: String, default: 'Anonymous' }, // Add this line
     ownerId: { type: String, required: true, index: true }, // Make it required and indexed for faster lookups
     views: { type: Number, default: 0 },
     submissions: { type: Number, default: 0 },
