@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { getPublicForm, postSubmission } from "../Controllers/publicController.js";
+import { getPublicForm, postSubmission, validateSubmission } from "../Controllers/publicController.js";
 
 const router = Router();
 router.get('/forms/:slug', getPublicForm);
-router.post('/forms/:slug/submit', postSubmission);
+router.post('/forms/:slug/submit', validateSubmission, postSubmission);
 
 export default router;

@@ -36,11 +36,9 @@ export const validateSubmission = [
         
         const validations = [];
         for (const field of form.published.fields) {
-            // Check for required fields
             if (field.config.required) {
                 validations.push(body(`answers.${field.id}`).notEmpty().withMessage(`Field "${field.config.label}" is required.`));
             }
-            // Add type-specific validation
             if (field.type === 'email') {
                 validations.push(body(`answers.${field.id}`).if(body(`answers.${field.id}`).notEmpty()).isEmail().withMessage(`Field "${field.config.label}" must be a valid email address.`));
             }
@@ -49,7 +47,6 @@ export const validateSubmission = [
             }
         }
         
-        // Run all validations
         await Promise.all(validations.map(validation => validation.run(req)));
         
         const errors = validationResult(req);
@@ -57,7 +54,6 @@ export const validateSubmission = [
             return res.status(400).json({ errors: errors.array() });
         }
         
-        // Attach form to request to avoid fetching it again
         req.form = form; 
         next();
     }
