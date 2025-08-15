@@ -4,7 +4,7 @@ import { Button } from '../components/Ui/Button'
 
 const SharePage = () => {
   // This would come from backend later, for now using hardcoded data
-  const [publishedForms] = useState([
+  const [publishedForms, setPublishedForms] = useState([
     {
       id: 'form-1',
       title: 'Customer Feedback Form',
@@ -50,6 +50,17 @@ const SharePage = () => {
                     <Button variant="ghost">View Submissions</Button>
                   </Link>
                   <Button onClick={() => handleShare(form.id)}>Share</Button>
+                  <Button 
+                    onClick={() => {
+                      if (window.confirm('Are you sure you want to delete this form? This action cannot be undone.')) {
+                        // TODO: Connect to backend
+                        setPublishedForms(forms => forms.filter(f => f.id !== form.id));
+                      }
+                    }}
+                    className="bg-red-950/50 text-red-400 hover:bg-red-900/30 hover:text-red-300"
+                  >
+                    Delete
+                  </Button>
                 </div>
               </div>
             </div>
