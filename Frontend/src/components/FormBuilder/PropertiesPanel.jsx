@@ -2,6 +2,7 @@ import { Card } from "../Formbuilder_Ui/Card";
 import { Switch } from "../Formbuilder_Ui/Switch";
 import { hasMinMax, hasOptions, hasProp } from "../Utilis/fieldConfig";
 import { Input, Label } from './../Formbuilder_Ui/Input';
+import { OptionsEditor } from './OptionsEditor';
 
 
 export const PropertiesPanel = ({ selectedField, updateSelected }) => (

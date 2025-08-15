@@ -189,20 +189,77 @@ function PreviewModal({ open, onClose, fields }) {
   // keep simple: control via props
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-40 grid place-items-center bg-black/60 p-4" onClick={onClose}>
-      <div className="w-full max-w-2xl rounded-2xl border border-neutral-800 bg-neutral-950 p-5" onClick={(e) => e.stopPropagation()}>
-        <div className="mb-4 flex items-center justify-between">
-          <div className="text-lg font-semibold">Preview</div>
-          <Button onClick={onClose} className="border border-neutral-700 hover:bg-neutral-900">Close</Button>
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 px-4 py-6 sm:p-6 md:p-8 backdrop-blur-sm" onClick={onClose}>
+      <div 
+        className="relative w-full max-w-3xl rounded-2xl border border-neutral-700/50 bg-neutral-950 shadow-2xl ring-1 ring-white/10" 
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="sticky top-0 flex items-center justify-between border-b border-neutral-800 bg-neutral-950/90 px-6 py-4 backdrop-blur supports-[backdrop-filter]:bg-neutral-950/50">
+          <div>
+            <h3 className="text-xl font-semibold text-white flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-indigo-400">
+                <path d="M12 15a3 3 0 100-6 3 3 0 000 6z" />
+                <path fillRule="evenodd" d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 010-1.113zM17.25 12a5.25 5.25 0 11-10.5 0 5.25 5.25 0 0110.5 0z" clipRule="evenodd" />
+              </svg>
+              Form Preview
+            </h3>
+            <p className="mt-1 text-sm text-neutral-400">This is how your form will appear to users</p>
+          </div>
+          <Button onClick={onClose} className="border border-neutral-700/50 hover:bg-neutral-800/50 hover:border-neutral-600 transition-all duration-200 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+              <path fillRule="evenodd" d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z" clipRule="evenodd" />
+            </svg>
+            Close
+          </Button>
         </div>
-        <form className="space-y-4">
-          {fields.map((f) => (
-            <div key={f.id}>
-              <div className="mb-1 text-sm text-neutral-300">{f.config.label}</div>
-              {renderLive(f)}
-            </div>
-          ))}
-        </form>
+
+        {/* Form Content */}
+        <div className="max-h-[calc(100vh-14rem)] overflow-y-auto px-6 py-6 scrollbar-thin scrollbar-track-neutral-900 scrollbar-thumb-neutral-700">
+          <form className="space-y-6">
+            {fields.map((f, index) => (
+              <div key={f.id} className="group rounded-lg border border-neutral-800/50 bg-gradient-to-b from-neutral-900/50 to-neutral-900/30 p-5 transition-all duration-200 hover:border-neutral-700/50">
+                <label className="block">
+                  <span className="mb-2 flex items-center gap-2 text-sm font-medium text-neutral-200">
+                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-neutral-800 text-xs font-semibold text-neutral-400">
+                      {index + 1}
+                    </span>
+                    {f.config.label}
+                    {f.config.required && (
+                      <span className="ml-1 text-red-500" title="Required field">*</span>
+                    )}
+                  </span>
+                  {f.config.description && (
+                    <p className="mb-3 text-sm text-neutral-500">{f.config.description}</p>
+                  )}
+                  <div className="relative">
+                    {renderLive(f)}
+                    <div className="absolute inset-0 rounded-lg ring-1 ring-inset ring-white/10 transition-opacity group-hover:ring-white/20" />
+                  </div>
+                </label>
+              </div>
+            ))}
+
+            {fields.length === 0 && (
+              <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-neutral-800 p-12 text-center">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-12 w-12 text-neutral-700">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                </svg>
+                <p className="mt-4 text-neutral-400">No fields added yet. Add some fields to preview your form.</p>
+                <p className="mt-2 text-sm text-neutral-600">Fields will appear here as you add them</p>
+              </div>
+            )}
+
+            {fields.length > 0 && (
+              <div className="sticky bottom-0 flex items-center justify-between gap-4 border-t border-neutral-800 bg-neutral-950/90 pt-4 backdrop-blur supports-[backdrop-filter]:bg-neutral-950/50">
+                <p className="text-sm text-neutral-500">{fields.length} field{fields.length !== 1 ? 's' : ''} in total</p>
+                <Button className="bg-indigo-600 hover:bg-indigo-500 transition-colors duration-200">
+                  Submit Form
+                </Button>
+              </div>
+            )}
+          </form>
+        </div>
       </div>
     </div>
   );

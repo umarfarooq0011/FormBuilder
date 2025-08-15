@@ -15,6 +15,8 @@ const FieldSchema = new Schema({
 const FormSchema = new Schema({
     title: { type: String, default: 'Untitled Form' },
     ownerId: { type: String, default: 'demo' }, // plug in real auth later
+    views: { type: Number, default: 0 },
+    submissions: { type: Number, default: 0 },
 
     // DRAFT the builder edits live
     fields: { type: [FieldSchema], default: [] },

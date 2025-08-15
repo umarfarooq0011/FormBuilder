@@ -3,7 +3,11 @@ import Submission from '../Models/Submission.model.js';
 
 export const getPublicForm = async (req, res, next) => {
     try {
-        const form = await Form.findOne({ 'published.slug': req.params.slug, 'published.isPublished': true });
+        const form = await Form.findOneAndUpdate(
+            { 'published.slug': req.params.slug, 'published.isPublished': true },
+            { $inc: { views: 1 } },
+            { new: true }
+        );
          if (!form) return res.status(404).json({ message: 'Public form not found' });
          res.json({
       form: {
@@ -17,12 +21,23 @@ export const getPublicForm = async (req, res, next) => {
         res.status(500).json({ message: 'Internal Server Error' });
         next(error);
     }
-}
+};
 
 export const postSubmission = async (req, res, next) => {
      try {
     const form = await Form.findOne({ 'published.slug': req.params.slug, 'published.isPublished': true });
     if (!form) return res.status(404).json({ message: 'Public form not found' });
+
+    // Data Validation
+    for (const field of form.published.fields) {
+      if (field.config.required && !req.body.answers[field.id]) {
+        return res.status(400).json({ message: `Field "${field.config.label}" is required.` });
+      }
+    }
+    
+    // Increment submissions count
+    form.submissions += 1;
+    await form.save();
 
     const sub = await Submission.create({
       form: form._id,
@@ -38,4 +53,4 @@ export const postSubmission = async (req, res, next) => {
     res.status(500).json({ message: 'Internal Server Error' });
     next(error);
   }
-}
+};
