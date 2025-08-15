@@ -1,32 +1,17 @@
-// Unique ID generator and classnames combiner
+// UTILITIES
 export const uid = () => Math.random().toString(36).slice(2, 9);
+export const cx = (...a) => a.filter(Boolean).join(" ");
 
-// Palette: visible list on the left
-
+// FORM DATA
 export const PALETTE = [
-  { type: "text", label: "Input" },
-  { type: "password", label: "Password" },
-  { type: "email", label: "Email" },
-  { type: "tel", label: "Phone" },
-  { type: "url", label: "URL" },
-  { type: "number", label: "Number" },
-  { type: "date", label: "Date" },
-  { type: "time", label: "Time" },
-  { type: "datetime-local", label: "Date & Time" },
-  { type: "month", label: "Month" },
-  { type: "week", label: "Week" },
-  { type: "color", label: "Color" },
-  { type: "textarea", label: "Textarea" },
-  { type: "select", label: "Select" },
-  { type: "radio", label: "Radio Group" },
-  { type: "checkbox", label: "Checkbox" },
-  { type: "checkbox-group", label: "Checkbox Group" },
-  { type: "file", label: "File Upload" },
-  { type: "range", label: "Range" },
-  { type: "switch", label: "Switch" },
+  { type: "text", label: "Input" }, { type: "password", label: "Password" }, { type: "email", label: "Email" },
+  { type: "tel", label: "Phone" }, { type: "url", label: "URL" }, { type: "number", label: "Number" },
+  { type: "range", label: "Range" }, { type: "color", label: "Color" }, { type: "date", label: "Date" },
+  { type: "time", label: "Time" }, { type: "datetime-local", label: "DateTime" }, { type: "month", label: "Month" },
+  { type: "week", label: "Week" }, { type: "textarea", label: "Textarea" }, { type: "select", label: "Select" },
+  { type: "radio", label: "Radio" }, { type: "checkbox", label: "Checkbox" }, { type: "checkbox-group", label: "Checkbox Group" },
+  { type: "file", label: "File" }, { type: "switch", label: "Switch" },
 ];
-
-// Default config per type (use functions to avoid reference sharing)
 
 export const DEFAULTS = {
   text: () => ({ label: "Input", placeholder: "Enter text", required: false }),
@@ -51,8 +36,7 @@ export const DEFAULTS = {
   switch: () => ({ label: "Enable feature", required: false }),
 };
 
-
-// Helpers to decide which controls to show in PropertiesPanel
-export const hasProp = (field, key) => Object.prototype.hasOwnProperty.call(DEFAULTS[field.type](), key);
+// PROPERTY HELPERS
+export const hasProp = (field, key) => field && DEFAULTS[field.type] && Object.prototype.hasOwnProperty.call(DEFAULTS[field.type](), key);
 export const hasOptions = (field) => hasProp(field, "options");
 export const hasMinMax = (field) => hasProp(field, "min") && hasProp(field, "max");

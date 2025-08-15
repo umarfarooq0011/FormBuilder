@@ -1,283 +1,380 @@
-/* eslint-disable no-unused-vars */
-import { useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { DndContext, MouseSensor, TouchSensor, useSensor, useSensors, DragOverlay } from "@dnd-kit/core";
-import { closestCenter } from "@dnd-kit/core";
-import { arrayMove } from "@dnd-kit/sortable";
-import { DEFAULTS, uid } from "../components/Utilis/fieldConfig";
-import { TopBar } from "../components/FormBuilder/TopBar";
-import { CanvasArea } from "../components/FormBuilder/CanvasArea";
-import { PropertiesPanel } from "../components/FormBuilder/PropertiesPanel";
-import { PalettePanel } from "../components/FormBuilder/PalettePanel";
-import { FieldCard } from "../components/FormBuilder/FieldCard";
-import { Button } from "../components/Formbuilder_Ui/Button"; 
-import { renderLive } from "../components/FormBuilder";
-
-
-// ... other imports
-import { Input } from "../components/Formbuilder_Ui/Input"; 
+import { useMemo, useState, useEffect } from "react";
+import { DndContext, MouseSensor, TouchSensor, useSensor, useSensors, DragOverlay, closestCenter } from "@dnd-kit/core";
+import { SortableContext } from "@dnd-kit/sortable";
+import { PALETTE, uid, cx, DEFAULTS } from "../components/Utilis/CONSTANTS.JS";
+import { ChevronLeft, ChevronRight, MenuIcon, SettingsIcon, XIcon } from "../components/Utilis/icons.jsx";
+import { Button, Card, Label, Input, Textarea,
+    PaletteDraggable, CanvasDropzone,
+    renderLive, FieldCard,
+    PropertiesPanel, GenerateWithAIModal } from "../components/FormBuilder/FormBuilderComponent";
 
 
 
 
+export const FormBuilderPage = () => {
+  const sensors = useSensors(useSensor(MouseSensor, { activationConstraint: { distance: 8 } }), useSensor(TouchSensor));
 
-
-export const FormBuilderPage = ()  => {
-  const navigate = useNavigate();
-  const { formId } = useParams();
-
-  
-
-
-  // Sensors: drag starts after 5px for mouse; touch enabled
-  const sensors = useSensors(
-    useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(TouchSensor)
-  );
-
-  // Core state
-  const [formTitle, setFormTitle] = useState("Untitled Form");
-  const [formDescription, setFormDescription] = useState("");
-  const [fields, setFields] = useState([]); // [{id, type, config}]
-  const [activeDrag, setActiveDrag] = useState(null); // {from: 'palette'|'canvas', item}
+  const [rows, setRows] = useState([]);
+  const [activeDrag, setActiveDrag] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
-  const [showPreview, setShowPreview] = useState(false); // State for preview modal
-  const selectedField = useMemo(() => fields.find((f) => f.id === selectedId) || null, [fields, selectedId]);
+  const [formTitle, setFormTitle] = useState("My Awesome Form");
+  const [formDescription, setFormDescription] = useState("");
+  
+  const [isPaletteOpen, setPaletteOpen] = useState(true);
+  const [isPropertiesOpen, setPropertiesOpen] = useState(true);
+  const [mobileSheet, setMobileSheet] = useState(null);
+  const [showAIModal, setShowAIModal] = useState(false);
 
-  // CRUD helpers
-  const addField = (type, indexAt = fields.length) => {
-    const base = DEFAULTS[type] ? DEFAULTS[type]() : {};
-    const item = { id: uid(), type, config: base };
-    const next = fields.slice();
-    next.splice(indexAt, 0, item);
-    setFields(next);
-    setSelectedId(item.id);
+  const fields = useMemo(() => rows.flatMap(row => row.fields), [rows]);
+  const selectedField = useMemo(() => fields.find(f => f.id === selectedId) || null, [fields, selectedId]);
+
+  const [q, setQ] = useState("");
+  const filteredPalette = useMemo(() => PALETTE.filter(p => (p.label + p.type).toLowerCase().includes(q.toLowerCase())), [q]);
+  const [showPreview, setShowPreview] = useState(false);
+
+  useEffect(() => {
+    const isModalOpen = mobileSheet || showAIModal || showPreview;
+    document.body.style.overflow = isModalOpen ? 'hidden' : 'auto';
+    return () => { document.body.style.overflow = 'auto'; };
+  }, [mobileSheet, showAIModal, showPreview]);
+
+  const findFieldLocation = (id) => {
+    for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+      const fieldIndex = rows[rowIndex].fields.findIndex(f => f.id === id);
+      if (fieldIndex !== -1) {
+        return { rowIndex, fieldIndex, row: rows[rowIndex] };
+      }
+    }
+    return null;
+  };
+
+  const addField = (type, rowIndex = rows.length) => {
+    const newField = { id: uid(), type, config: DEFAULTS[type]?.() || {} };
+    const newRow = { id: uid(), fields: [newField] };
+    setRows(prev => [...prev.slice(0, rowIndex), newRow, ...prev.slice(rowIndex)]);
+    setSelectedId(newField.id);
   };
 
   const duplicateField = (id) => {
-    const idx = fields.findIndex((f) => f.id === id);
-    if (idx === -1) return;
-    const copy = JSON.parse(JSON.stringify(fields[idx]));
-    copy.id = uid();
-    const next = fields.slice();
-    next.splice(idx + 1, 0, copy);
-    setFields(next);
-    setSelectedId(copy.id);
+    const location = findFieldLocation(id);
+    if (!location) return;
+    const { rowIndex } = location;
+    const fieldToCopy = rows[rowIndex].fields.find(f => f.id === id);
+    const newField = { ...JSON.parse(JSON.stringify(fieldToCopy)), id: uid() };
+    const newRow = { id: uid(), fields: [newField] };
+    setRows(prev => [...prev.slice(0, rowIndex + 1), newRow, ...prev.slice(rowIndex + 1)]);
+    setSelectedId(newField.id);
   };
 
   const removeField = (id) => {
-    const next = fields.filter((f) => f.id !== id);
-    setFields(next);
+    setRows(prev => {
+        const next = JSON.parse(JSON.stringify(prev));
+        const location = findFieldLocation(id);
+        if(!location) return next;
+        const { rowIndex, fieldIndex } = location;
+        next[rowIndex].fields.splice(fieldIndex, 1);
+        return next.filter(row => row.fields.length > 0);
+    });
     if (selectedId === id) setSelectedId(null);
   };
 
   const updateSelected = (patch) => {
-    if (!selectedField) return;
-    setFields((prev) => prev.map((f) => (f.id === selectedId ? { ...f, config: { ...f.config, ...patch } } : f)));
+    if (!selectedId) return;
+    setRows(prev => {
+        const next = JSON.parse(JSON.stringify(prev));
+        const location = findFieldLocation(selectedId);
+        if(!location) return next;
+        const { rowIndex, fieldIndex } = location;
+        const currentConfig = next[rowIndex].fields[fieldIndex].config;
+        next[rowIndex].fields[fieldIndex].config = { ...currentConfig, ...patch };
+        return next;
+    });
   };
 
-  // DnD handlers
-  const handleDragStart = (event) => {
-    const { active } = event;
+  const handleDragStart = ({ active }) => {
     if (String(active.id).startsWith("palette-")) {
       const type = String(active.id).replace("palette-", "");
-      setActiveDrag({ from: "palette", item: { type } });
+      setActiveDrag({ from: "palette", item: PALETTE.find(p => p.type === type) });
     } else {
-      const item = fields.find((f) => f.id === active.id);
-      setActiveDrag({ from: "canvas", item });
+      setActiveDrag({ from: "canvas", item: fields.find(f => f.id === active.id) });
     }
   };
 
-  const handleDragEnd = (event) => {
-    const { active, over } = event;
+  const handleDragEnd = ({ active, over }) => {
     setActiveDrag(null);
-    if (!over) return;
-    const overId = over.id;
+    if (!over || active.id === over.id) return;
 
-    // From palette: insert new field
-    if (activeDrag?.from === "palette") {
-      if (overId === "canvas-dropzone") {
-        addField(activeDrag.item.type);
-      } else {
-        const idx = fields.findIndex((f) => f.id === overId);
-        addField(activeDrag.item.type, idx < 0 ? fields.length : idx + 1);
-      }
-      return;
-    }
+    const isFromPalette = active.id.toString().startsWith('palette-');
+    const overId = over.id.toString();
 
-    // From canvas: reorder
-    if (activeDrag?.from === "canvas") {
-      const oldIndex = fields.findIndex((f) => f.id === active.id);
-      const newIndex = overId === "canvas-dropzone" ? fields.length - 1 : fields.findIndex((f) => f.id === overId);
-      if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
-        setFields((items) => arrayMove(items, oldIndex, newIndex));
-      }
+    if (isFromPalette) {
+        const type = active.id.toString().replace('palette-', '');
+        const newField = { id: uid(), type, config: DEFAULTS[type]?.() || {} };
+
+        if (overId === 'canvas-dropzone') {
+            setRows(prev => [...prev, { id: uid(), fields: [newField] }]);
+        } else {
+            const overLocation = findFieldLocation(overId);
+            if (overLocation) {
+                const { rowIndex, row } = overLocation;
+                setRows(prev => {
+                    const next = [...prev];
+                    if (row.fields.length < 2) {
+                        next[rowIndex].fields.push(newField);
+                    } else {
+                        next.splice(rowIndex + 1, 0, { id: uid(), fields: [newField] });
+                    }
+                    return next;
+                });
+            }
+        }
+        setSelectedId(newField.id);
+    } else {
+        const activeLocation = findFieldLocation(active.id);
+        const overLocation = findFieldLocation(over.id);
+        if (!activeLocation || !overLocation) return;
+
+        setRows(prev => {
+            const next = JSON.parse(JSON.stringify(prev));
+            const activeField = next[activeLocation.rowIndex].fields.splice(activeLocation.fieldIndex, 1)[0];
+
+            if (activeLocation.rowIndex === overLocation.rowIndex) {
+                next[overLocation.rowIndex].fields.splice(overLocation.fieldIndex, 0, activeField);
+            } else {
+                if (next[overLocation.rowIndex].fields.length < 2) {
+                    next[overLocation.rowIndex].fields.push(activeField);
+                } else {
+                    next.splice(overLocation.rowIndex + 1, 0, { id: uid(), fields: [activeField] });
+                }
+            }
+            return next.filter(row => row.fields.length > 0);
+        });
     }
   };
 
-  // Actions
-  const handlePublish = async () => {
-    // Later this will save to backend
-    // For now just navigate to share page
-    navigate('/share');
-  };  // Drag overlay for palette items
-  const ActiveDragOverlay = activeDrag?.from === "palette" ? (
-    <div className="rounded-xl border border-indigo-600/40 bg-indigo-600/20 px-3 py-2 text-sm text-indigo-100 shadow-xl">
-      {activeDrag?.item?.type}
-    </div>
-  ) : null;
+  const handleShare = () => {
+    const payload = { title: formTitle, description: formDescription, rows };
+    navigator.clipboard.writeText(JSON.stringify(payload, null, 2))
+      .then(() => alert("Form JSON copied to clipboard."))
+      .catch(() => alert("Failed to copy."));
+  };
+  const handlePublish = () => alert("Publish clicked! Replace with API call.");
+
+  const getGridLayoutClasses = () => {
+    if (isPaletteOpen && isPropertiesOpen) return "md:grid-cols-[280px_1fr_280px]";
+    if (isPaletteOpen) return "md:grid-cols-[280px_1fr_auto]";
+    if (isPropertiesOpen) return "md:grid-cols-[auto_1fr_280px]";
+    return "md:grid-cols-[auto_1fr_auto]";
+  };
+
+  const PalettePanelContent = () => (
+      <>
+        <Input value={q} onChange={(e)=>setQ(e.target.value)} placeholder="Search..." className="mb-3" />
+        <div className="grid grid-cols-1 gap-2">
+          {filteredPalette.map((p)=>(
+            <PaletteDraggable key={p.type} id={`palette-${p.type}`}>
+              <button type="button" onClick={()=> { addField(p.type); setMobileSheet(null); }} className="w-full text-left rounded-xl border border-neutral-800 bg-neutral-900/60 px-3 py-2 text-sm text-neutral-200 hover:bg-neutral-900">{p.label}</button>
+            </PaletteDraggable>
+          ))}
+        </div>
+      </>
+  );
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-neutral-950 via-neutral-950 to-black text-neutral-100">
-      {/* Top bar */}
-      <TopBar 
-        onPreview={() => setShowPreview(true)} 
-        onPublish={handlePublish}
-        title={formTitle}
-        description={formDescription}
-        onTitleChange={setFormTitle}
-        onDescriptionChange={setFormDescription}
-      />
-
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-      >
-        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 p-4 md:grid-cols-12">
-          {/* Palette */}
-          <div className="md:col-span-3">
-            <PalettePanel onAdd={(type) => addField(type)} />
+      <header className="sticky top-0 z-30 border-b border-neutral-900/80 bg-black/60 backdrop-blur">
+        <div className="mx-auto flex h-14 max-w-screen-2xl items-center justify-between px-4">
+          <div className="flex items-center gap-3">
+            <div className="h-7 w-7 rounded-xl bg-indigo-600/20 ring-1 ring-indigo-600/50" />
+            <div>
+              <div className="text-sm text-neutral-400">Builder</div>
+              <div className="-mt-1 text-base font-semibold">Create your form</div>
+            </div>
           </div>
-
-          {/* Canvas */}
-          <div className="md:col-span-6">
-            <CanvasArea
-              fields={fields}
-              selectedId={selectedId}
-              onSelect={setSelectedId}
-              onDuplicate={duplicateField}
-              onRemove={removeField}
-            />
-          </div>
-
-          {/* Properties */}
-          <div className="md:col-span-3">
-            <PropertiesPanel selectedField={selectedField} updateSelected={updateSelected} />
+          <div className="flex items-center gap-2">
+            <div className="hidden md:flex items-center gap-2">
+              <Button onClick={()=>setShowPreview(true)} className="border border-neutral-700 hover:bg-neutral-900">Preview</Button>
+              <Button onClick={handleShare} className="border border-neutral-700 hover:bg-neutral-900">Share</Button>
+              <Button onClick={handlePublish} className="bg-indigo-600 text-white hover:bg-indigo-500">Publish</Button>
+            </div>
+            <div className="md:hidden flex items-center gap-2">
+                <Button onClick={() => setMobileSheet('palette')} className="!px-2 border border-neutral-700"><MenuIcon /></Button>
+                <Button onClick={() => setMobileSheet('properties')} className="!px-2 border border-neutral-700"><SettingsIcon /></Button>
+            </div>
           </div>
         </div>
+      </header>
 
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+        <div className={cx("mx-auto grid max-w-screen-2xl gap-4 p-4 transition-all duration-300 grid-cols-1", getGridLayoutClasses())}>
+          
+          <aside className={cx("hidden md:block transition-all duration-300", isPaletteOpen ? "w-[280px]" : "w-12")}>
+            <Card className="h-full overflow-y-auto p-3">
+              <div className="mb-2 flex items-center justify-between">
+                <div className={cx("text-sm font-semibold text-neutral-300", !isPaletteOpen && "hidden")}>Components</div>
+                <button onClick={() => setPaletteOpen(!isPaletteOpen)} className="text-neutral-400 hover:text-white">
+                  {isPaletteOpen ? <ChevronLeft /> : <ChevronRight />}
+                </button>
+              </div>
+              <div className={cx(!isPaletteOpen && "hidden")}><PalettePanelContent /></div>
+            </Card>
+          </aside>
+
+          <main>
+            <Card className="p-4 space-y-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="flex-grow w-full">
+                      <Label>Form Title</Label>
+                      <Input value={formTitle} onChange={e => setFormTitle(e.target.value)} placeholder="Enter form title" />
+                  </div>
+                  <Button onClick={() => setShowAIModal(true)} className="border border-indigo-500/50 bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30 sm:mt-5 flex items-center gap-2 w-full sm:w-auto justify-center">
+                      ✨ Generate with AI
+                  </Button>
+              </div>
+              <div>
+                  <Label>Description (Optional)</Label>
+                  <Textarea value={formDescription} onChange={e => setFormDescription(e.target.value)} placeholder="Describe your form" rows={2} />
+              </div>
+            </Card>
+            <Card className="p-3 mt-4">
+              <div className="mb-2 text-sm font-semibold text-neutral-300">Canvas</div>
+              <CanvasDropzone id="canvas-dropzone">
+                {rows.length === 0 ? (
+                  <div className="grid h-full min-h-[220px] place-items-center text-neutral-500">Drag components here</div>
+                ) : (
+                  <SortableContext items={fields.map(f => f.id)}>
+                    <div className="flex flex-col gap-4">
+                      {rows.map(row => (
+                        <div key={row.id} className="flex flex-col md:flex-row gap-4">
+                          {row.fields.map(field => (
+                            <div key={field.id} className="flex-1 min-w-0">
+                                <FieldCard rowId={row.id} field={field} selected={selectedId === field.id} onSelect={setSelectedId} onDuplicate={duplicateField} onRemove={removeField} />
+                            </div>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  </SortableContext>
+                )}
+              </CanvasDropzone>
+            </Card>
+          </main>
+
+          <aside className={cx("hidden md:block transition-all duration-300", isPropertiesOpen ? "w-[280px]" : "w-12")}>
+            <Card className="h-full overflow-y-auto p-3">
+              <div className="mb-2 flex items-center justify-between">
+                <button onClick={() => setPropertiesOpen(!isPropertiesOpen)} className="text-neutral-400 hover:text-white">
+                  {isPropertiesOpen ? <ChevronRight /> : <ChevronLeft />}
+                </button>
+                <div className={cx("text-sm font-semibold text-neutral-300", !isPropertiesOpen && "hidden")}>Properties</div>
+              </div>
+              <div className={cx(!isPropertiesOpen && "hidden")}>
+                <PropertiesPanel selectedField={selectedField} onUpdate={updateSelected} />
+              </div>
+            </Card>
+          </aside>
+        </div>
         <DragOverlay>
-          {activeDrag?.from === "palette" ? (
-            <div className="rounded-xl border border-indigo-600/40 bg-indigo-600/20 px-3 py-2 text-sm text-indigo-100 shadow-xl">
-              {activeDrag.item.type}
-            </div>
-          ) : activeDrag?.from === "canvas" ? (
-            <div className="opacity-75">
-              <FieldCard
-                field={activeDrag.item}
-                selected={false}
-                onSelect={() => {}}
-                onDuplicate={() => {}}
-                onRemove={() => {}}
-              />
-            </div>
-          ) : null}
+            {activeDrag && (
+                activeDrag.from === 'palette' ? 
+                <div className="rounded-xl border border-indigo-600/40 bg-indigo-600/20 px-3 py-2 text-sm text-indigo-100 shadow-xl">{activeDrag.item?.label}</div>
+                : <FieldCard field={activeDrag.item} selected={false} onSelect={()=>{}} onDuplicate={()=>{}} onRemove={()=>{}} />
+            )}
         </DragOverlay>
       </DndContext>
 
-      {/* Preview Modal */}
-      <PreviewModal
-        open={showPreview}
-        onClose={() => setShowPreview(false)}
-        fields={fields}
-      />
-    </div>
-  );
-}
-
-// Local state for preview modal
-import { useState as useReactState } from "react";
-
-
-function PreviewModal({ open, onClose, fields }) {
-  const [show, setShow] = useReactState(open);
-  // keep simple: control via props
-  if (!open) return null;
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 px-4 py-6 sm:p-6 md:p-8 backdrop-blur-sm" onClick={onClose}>
-      <div 
-        className="relative w-full max-w-3xl rounded-2xl border border-neutral-700/50 bg-neutral-950 shadow-2xl ring-1 ring-white/10" 
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="sticky top-0 flex items-center justify-between border-b border-neutral-800 bg-neutral-950/90 px-6 py-4 backdrop-blur supports-[backdrop-filter]:bg-neutral-950/50">
-          <div>
-            <h3 className="text-xl font-semibold text-white flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-indigo-400">
-                <path d="M12 15a3 3 0 100-6 3 3 0 000 6z" />
-                <path fillRule="evenodd" d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 010-1.113zM17.25 12a5.25 5.25 0 11-10.5 0 5.25 5.25 0 0110.5 0z" clipRule="evenodd" />
-              </svg>
-              Form Preview
-            </h3>
-            <p className="mt-1 text-sm text-neutral-400">This is how your form will appear to users</p>
-          </div>
-          <Button onClick={onClose} className="border border-neutral-700/50 hover:bg-neutral-800/50 hover:border-neutral-600 transition-all duration-200 flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-              <path fillRule="evenodd" d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z" clipRule="evenodd" />
-            </svg>
-            Close
-          </Button>
-        </div>
-
-        {/* Form Content */}
-        <div className="max-h-[calc(100vh-14rem)] overflow-y-auto px-6 py-6 scrollbar-thin scrollbar-track-neutral-900 scrollbar-thumb-neutral-700">
-          <form className="space-y-6">
-            {fields.map((f, index) => (
-              <div key={f.id} className="group rounded-lg border border-neutral-800/50 bg-gradient-to-b from-neutral-900/50 to-neutral-900/30 p-5 transition-all duration-200 hover:border-neutral-700/50">
-                <label className="block">
-                  <span className="mb-2 flex items-center gap-2 text-sm font-medium text-neutral-200">
-                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-neutral-800 text-xs font-semibold text-neutral-400">
-                      {index + 1}
-                    </span>
-                    {f.config.label}
-                    {f.config.required && (
-                      <span className="ml-1 text-red-500" title="Required field">*</span>
-                    )}
-                  </span>
-                  {f.config.description && (
-                    <p className="mb-3 text-sm text-neutral-500">{f.config.description}</p>
-                  )}
-                  <div className="relative">
-                    {renderLive(f)}
-                    <div className="absolute inset-0 rounded-lg ring-1 ring-inset ring-white/10 transition-opacity group-hover:ring-white/20" />
+      {mobileSheet && (
+          <div className="md:hidden fixed inset-0 z-40">
+              <div className="absolute inset-0 bg-black/60" onClick={() => setMobileSheet(null)}></div>
+              <div className="absolute bottom-0 left-0 right-0 max-h-[80vh] bg-neutral-950 rounded-t-2xl border-t border-neutral-800 p-4 overflow-y-auto">
+                  <div className="mb-4 flex items-center justify-between">
+                      <div className="text-lg font-semibold">{mobileSheet === 'palette' ? 'Components' : 'Properties'}</div>
+                      <button onClick={() => setMobileSheet(null)} className="text-neutral-400 hover:text-white"><XIcon /></button>
                   </div>
-                </label>
+                  {mobileSheet === 'palette' ? <PalettePanelContent /> : <PropertiesPanel selectedField={selectedField} onUpdate={updateSelected} />}
               </div>
-            ))}
+          </div>
+      )}
 
-            {fields.length === 0 && (
-              <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-neutral-800 p-12 text-center">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-12 w-12 text-neutral-700">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-                </svg>
-                <p className="mt-4 text-neutral-400">No fields added yet. Add some fields to preview your form.</p>
-                <p className="mt-2 text-sm text-neutral-600">Fields will appear here as you add them</p>
+      {showPreview && (
+        <div className="fixed inset-0 z-50 overflow-hidden bg-black/60" onClick={()=>setShowPreview(false)}>
+          <div className="min-h-full px-4 py-6 md:py-12 flex items-center justify-center">
+            <div className="w-full max-w-2xl rounded-2xl border border-neutral-800 bg-neutral-950 shadow-2xl" onClick={(e)=>e.stopPropagation()}>
+              {/* Header with close button */}
+              <div className="sticky top-0 z-10 bg-neutral-950 rounded-t-2xl border-b border-neutral-800 p-6">
+                <button 
+                  onClick={() => setShowPreview(false)}
+                  className="absolute right-4 top-4 p-2 text-neutral-400 hover:text-white"
+                >
+                  <XIcon />
+                </button>
+                <div className="pr-8 text-center">
+                  <h2 className="text-2xl font-bold text-white">{formTitle}</h2>
+                  {formDescription && <p className="mt-2 text-neutral-400">{formDescription}</p>}
+                </div>
               </div>
-            )}
 
-            {fields.length > 0 && (
-              <div className="sticky bottom-0 flex items-center justify-between gap-4 border-t border-neutral-800 bg-neutral-950/90 pt-4 backdrop-blur supports-[backdrop-filter]:bg-neutral-950/50">
-                <p className="text-sm text-neutral-500">{fields.length} field{fields.length !== 1 ? 's' : ''} in total</p>
-                <Button className="bg-indigo-600 hover:bg-indigo-500 transition-colors duration-200">
-                  Submit Form
-                </Button>
+              {/* Scrollable form content */}
+              <div className="max-h-[calc(85vh-8rem)] overflow-y-auto p-6">
+                <form onSubmit={(e) => e.preventDefault()} className="space-y-5">
+                  {rows.map(row => (
+                    <div key={row.id} className="flex flex-col md:flex-row gap-4">
+                      {row.fields.map(f => (
+                        <div key={f.id} className="flex-1 min-w-0">
+                          <label className="block mb-1.5 text-sm font-medium text-neutral-300" htmlFor={f.id}>
+                            {f.config.label}
+                            {f.config.required && <span className="text-red-400 ml-1">*</span>}
+                          </label>
+                          {renderLive(f)}
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </form>
               </div>
-            )}
-          </form>
+
+              {/* Fixed footer with buttons */}
+              <div className="sticky bottom-0 z-10 bg-neutral-950 rounded-b-2xl border-t border-neutral-800 p-4">
+                <div className="flex justify-end gap-3">
+                  <Button type="button" onClick={()=>setShowPreview(false)} className="border border-neutral-700 hover:bg-neutral-900">Close</Button>
+                  <Button type="submit" className="bg-indigo-600 text-white hover:bg-indigo-500">Submit</Button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
+
+      {showAIModal && (
+        <GenerateWithAIModal 
+            onClose={() => setShowAIModal(false)}
+            onGenerate={(generatedForm) => {
+                try {
+                    if (!generatedForm || !Array.isArray(generatedForm.rows)) {
+                        throw new Error('Invalid form data structure');
+                    }
+
+                    setFormTitle(generatedForm.title || 'Generated Form');
+                    setFormDescription(generatedForm.description || '');
+                    
+                    const newRows = generatedForm.rows.map(row => ({
+                        id: uid(),
+                        fields: Array.isArray(row?.fields) ? row.fields.map(field => ({
+                            id: uid(),
+                            type: field?.type || 'text',
+                            config: field?.config || DEFAULTS[field?.type || 'text']?.() || {}
+                        })) : []
+                    })).filter(row => row.fields.length > 0);
+                    
+                    setRows(newRows);
+                    setShowAIModal(false);
+                } catch (error) {
+                    console.error('Error processing generated form:', error);
+                    alert('Failed to process the generated form. Please try again.');
+                }
+            }}
+        />
+      )}
     </div>
   );
-}
+};

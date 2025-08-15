@@ -1,5 +1,6 @@
+import { uid } from "./CONSTANTS.JS";
 
-import { uid } from './fieldConfig';
+
 
 const USER_ID_KEY = 'formForgeUserId';
 
