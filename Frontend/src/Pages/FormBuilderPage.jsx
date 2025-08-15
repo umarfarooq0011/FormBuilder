@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { DndContext, MouseSensor, TouchSensor, useSensor, useSensors, DragOverlay } from "@dnd-kit/core";
 import { closestCenter } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
@@ -14,13 +14,21 @@ import { Button } from "../components/Formbuilder_Ui/Button";
 import { renderLive } from "../components/FormBuilder";
 
 
+// ... other imports
+import { Input } from "../components/Formbuilder_Ui/Input"; 
+
+
 
 
 
 
 export const FormBuilderPage = ()  => {
   const navigate = useNavigate();
+  const { formId } = useParams();
+
   
+
+
   // Sensors: drag starts after 5px for mouse; touch enabled
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
@@ -28,6 +36,8 @@ export const FormBuilderPage = ()  => {
   );
 
   // Core state
+  const [formTitle, setFormTitle] = useState("Untitled Form");
+  const [formDescription, setFormDescription] = useState("");
   const [fields, setFields] = useState([]); // [{id, type, config}]
   const [activeDrag, setActiveDrag] = useState(null); // {from: 'palette'|'canvas', item}
   const [selectedId, setSelectedId] = useState(null);
@@ -120,7 +130,14 @@ export const FormBuilderPage = ()  => {
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-neutral-950 via-neutral-950 to-black text-neutral-100">
       {/* Top bar */}
-      <TopBar onPreview={() => setShowPreview(true)} onPublish={handlePublish} />
+      <TopBar 
+        onPreview={() => setShowPreview(true)} 
+        onPublish={handlePublish}
+        title={formTitle}
+        description={formDescription}
+        onTitleChange={setFormTitle}
+        onDescriptionChange={setFormDescription}
+      />
 
       <DndContext
         sensors={sensors}
