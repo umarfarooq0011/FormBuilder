@@ -161,10 +161,10 @@ export const FormBuilderPage = () => {
   const handlePublish = () => alert("Publish clicked! Replace with API call.");
 
   const getGridLayoutClasses = () => {
-    if (isPaletteOpen && isPropertiesOpen) return "md:grid-cols-[280px_1fr_280px]";
-    if (isPaletteOpen) return "md:grid-cols-[280px_1fr_auto]";
-    if (isPropertiesOpen) return "md:grid-cols-[auto_1fr_280px]";
-    return "md:grid-cols-[auto_1fr_auto]";
+    if (isPaletteOpen && isPropertiesOpen) return "md:grid-cols-[minmax(280px,280px)_minmax(0,1fr)_minmax(280px,280px)]";
+    if (isPaletteOpen) return "md:grid-cols-[minmax(280px,280px)_minmax(0,1fr)_auto]";
+    if (isPropertiesOpen) return "md:grid-cols-[auto_minmax(0,1fr)_minmax(280px,280px)]";
+    return "md:grid-cols-[auto_minmax(0,1fr)_auto]";
   };
 
   const PalettePanelContent = () => (
@@ -220,7 +220,7 @@ export const FormBuilderPage = () => {
             </Card>
           </aside>
 
-          <main>
+          <main className="min-w-0 w-full">
             <Card className="p-4 space-y-4">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <div className="flex-grow w-full">
@@ -245,9 +245,9 @@ export const FormBuilderPage = () => {
                   <SortableContext items={fields.map(f => f.id)}>
                     <div className="flex flex-col gap-4">
                       {rows.map(row => (
-                        <div key={row.id} className="flex flex-col md:flex-row gap-4">
+                        <div key={row.id} className="flex flex-col lg:flex-row gap-4">
                           {row.fields.map(field => (
-                            <div key={field.id} className="flex-1 min-w-0">
+                            <div key={field.id} className="flex-1 min-w-0 w-full">
                                 <FieldCard rowId={row.id} field={field} selected={selectedId === field.id} onSelect={setSelectedId} onDuplicate={duplicateField} onRemove={removeField} />
                             </div>
                           ))}
